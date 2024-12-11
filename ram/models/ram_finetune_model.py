@@ -20,22 +20,49 @@ class RAMFinetuneModel(RAMBaseModel):
 
     def __init__(self, opt):
         super(RAMFinetuneModel, self).__init__(opt)
-        
-        # 定义额外的网络
-        if 'network_finetune' in opt:
-            self.net_finetune = build_network(opt['network_finetune'])
-            self.net_finetune = self.model_to_device(self.net_finetune)
-            self.print_network(self.net_finetune)
+
+    def load_pretrained_models(self):
+        # 加载预训练的finetune网络
+        load_path = self.opt['path'].get('pretrain_network_g', None)
+        if load_path is not None:
+            param_key = self.opt['path'].get('param_key_g', 'params')
+            self.load_network(self.net_g, load_path, self.opt['path'].get('strict_load_g', True), param_key)
+            self.net_g.eval()
+            if self.opt['network_g']['finetune_type'] == 'cond':
+                logger = get_root_logger()
+                logger.info('Start setting up finetuning parameters...')
+                
+                filter_name_list = np.loadtxt(self.opt['finetune_block']['filter_txt_path'], dtype=str)
+                filter_ratio = self.opt['finetune_block']['filter_ratio']
+                logger.info(f'Loading filter list from {self.opt["finetune_block"]["filter_txt_path"]}')
+                logger.info(f'Filter ratio set to: {filter_ratio}')
+                
+                finetune_name_list = filter_name_list[:int(len(filter_name_list)*filter_ratio)]
+                finetune_name_list = ['module.' + name for name in finetune_name_list]
+                logger.info(f'Will finetune {len(finetune_name_list)} modules')
+                
+                for name,param in self.net_g.named_parameters():
+                    layer_name = '.'.join(name.split('.')[:-1])
+                    if layer_name in finetune_name_list:
+                        param.requires_grad = True
+                    else:
+                        param.requires_grad = False
+                        
+                logger.info('Finetuning parameter setup completed')
 
     def init_training_settings(self):
-        super(RAMFinetuneModel, self).init_training_settings()
-        
-        # 加载预训练的finetune网络
-        load_path = self.opt['path'].get('pretrain_network_finetune', None)
-        if load_path is not None:
-            param_key = self.opt['path'].get('param_key_finetune', 'params')
-            self.load_network(self.net_finetune, load_path, self.opt['path'].get('strict_load_finetune', True), param_key)
+        self.net_g.train()
+        train_opt = self.opt['train']
 
+        self.ema_decay = train_opt.get('ema_decay', 0)
+        if self.ema_decay > 0:
+            self.init_ema_model()
+
+        self.load_pretrained_models()
+        self.setup_optimizers()
+        self.setup_schedulers()
+        self.setup_loss_functions()
+        
     def setup_optimizers(self):
         train_opt = self.opt['train']
         optim_params = []
@@ -44,13 +71,7 @@ class RAMFinetuneModel(RAMBaseModel):
             if v.requires_grad:
                 optim_params.append(v)
                 logger.warning(f'Params {k} will be optimized.')
-
-        if hasattr(self, 'net_finetune'):
-            for k, v in self.net_finetune.named_parameters():
-                if v.requires_grad:
-                    optim_params.append(v)
-                    logger.warning(f'Params {k} will be optimized.')
-
+            
         optim_type = train_opt['optim_g'].pop('type')
         self.optimizer_g = self.get_optimizer(optim_type, optim_params, **train_opt['optim_g'])
         self.optimizers.append(self.optimizer_g)
@@ -62,8 +83,6 @@ class RAMFinetuneModel(RAMBaseModel):
     def optimize_parameters(self, current_iter):
         self.optimizer_g.zero_grad()
         self.output = self.net_g(self.lq, self.mask)
-        if hasattr(self, 'net_finetune'):
-            self.output = self.net_finetune(self.output)
 
         l_total = 0
         loss_dict = OrderedDict()
@@ -201,8 +220,3 @@ class RAMFinetuneModel(RAMBaseModel):
         if self.mask is not None:
             out_dict['mask'] = self.mask.detach().cpu()
         return out_dict
-
-    def save(self, epoch, current_iter):
-        super(RAMFinetuneModel, self).save(epoch, current_iter)
-        if hasattr(self, 'net_finetune'):
-            self.save_network(self.net_finetune, 'net_finetune', current_iter)

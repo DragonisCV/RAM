@@ -33,7 +33,7 @@ datasets:
 
 # path
 path:
-  pretrain_network_g: experiments/ram_promptir_single_pretrained_1e-4_bs4_300epoch/models/net_g_latest.pth
+  pretrain_network_g: pretrained_model/ram_promptir_pretrain.pth
   param_key_g: model
   strict_load_g: false
   resume_state: ~

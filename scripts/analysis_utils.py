@@ -151,7 +151,7 @@ class BaseAnalysis(BaseModel):
                     module_name_list.append(module_name)
                     name_list.append(name)
                     module = eval(module_name)
-                    hook_list.append(Hook_back_loop(module, module_name))
+                    hook_list.append(Hook_back_loop(module, name))
 
         return hook_list
 

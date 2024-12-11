@@ -43,7 +43,7 @@ class MACAnalysis(BaseAnalysis):
             loss.backward()
             now_hook_layer_output = []
             for hook in self.hook_list:
-                last_hook_layer_output.append(hook.output.detach())
+                now_hook_layer_output.append(hook.output.detach())
             if step > 0:
                 dfdy = [hook.grad.detach() for hook in self.hook_list]
                 approx_dydx = [now - last for now, last in zip(now_hook_layer_output, last_hook_layer_output)]
