@@ -1,5 +1,5 @@
 # <p align=center> :fire: `Restore Anything with Masks：Leveraging Mask Image Modeling for Blind All-in-One Image Restoration (ECCV2024)`</p>
-## <div align="center"><a href="">Homepage(TBD)</a> | <a href="">Paper</a> | <a href="https://drive.google.com/drive/folders/1CDX02vmpPoeWBahvvg2OAH8jwhtBwwmB?usp=drive_link">Google Drive</a> | <a href="">Baidu Cloud(TBD)</a>
+## <div align="center"><a href="https://rq-wu.github.io/projects/RAM/index.html">Homepage</a> | <a href="https://arxiv.org/abs/2409.19403v1">Paper</a> | <a href="https://drive.google.com/drive/folders/1CDX02vmpPoeWBahvvg2OAH8jwhtBwwmB?usp=drive_link">Google Drive</a> | <a href="">Baidu Cloud(TBD)</a>
 
 This is the official PyTorch codes for the paper.  
 >**Restore Anything with Masks：Leveraging Mask Image Modeling for Blind All-in-One Image Restoration**<br>  [Chujie Qin](https://github.com/Dragonisss), [Ruiqi Wu](https://rq-wu.github.io/), [Zikun Liu](), [Xin Lin](https://linxin0.github.io/), [Chunle Guo](https://scholar.google.com/citations?user=RZLYwR0AAAAJ&hl=en), [Hyun Hee Park](s), [Chongyi Li<sup>*</sup>](https://li-chongyi.github.io/) （ * indicates corresponding author)<br>
