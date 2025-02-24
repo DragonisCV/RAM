@@ -13,6 +13,7 @@ This is the official PyTorch codes for the paper.
 
 ## :newspaper: News
 <ul>
+  <li><b>Feb 24, 2025</b>: A Jittor Version is available at <a href="https://github.com/Dragonisss/RAM-Jittor">RAM-Jittor</a>.</li>
   <li><b>Oct 20, 2024</b>: Release pretrained weights on <a href="https://drive.google.com/drive/folders/1CDX02vmpPoeWBahvvg2OAH8jwhtBwwmB?usp=drive_link">Google Drive</a>.</li>
   <li><b>Oct 3, 2024</b>: Release related code of our paper.</li>
 </ul>
@@ -244,14 +245,13 @@ python -m torch.distributed.launch \
 If you find our repo useful for your research, please consider citing our paper:
 
 ```bibtex
-@misc{qin2024restoremasksleveragingmask,
-      title={Restore Anything with Masks: Leveraging Mask Image Modeling for Blind All-in-One Image Restoration}, 
-      author={Chu-Jie Qin and Rui-Qi Wu and Zikun Liu and Xin Lin and Chun-Le Guo and Hyun Hee Park and Chongyi Li},
-      year={2024},
-      eprint={2409.19403},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2409.19403}, 
+@inproceedings{qin2024restore,
+  title={Restore Anything with Masks: Leveraging Mask Image Modeling for Blind All-in-One Image Restoration},
+  author={Qin, Chu-Jie and Wu, Rui-Qi and Liu, Zikun and Lin, Xin and Guo, Chun-Le and Park, Hyun Hee and Li, Chongyi},
+  booktitle={European Conference on Computer Vision},
+  pages={364--380},
+  year={2024},
+  organization={Springer}
 }
 ```
 
