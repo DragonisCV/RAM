@@ -126,13 +126,6 @@ class AdaptiveMaskL1Loss(nn.Module):
         self.in_chans=3
         
     def forward(self, pred, target, mask, weight=None, **kwargs):
-        """
-        Args:
-            pred (Tensor): of shape (N, C, H, W). Predicted tensor.
-            target (Tensor): of shape (N, C, H, W). Ground truth tensor.
-            weight (Tensor, optional): of shape (N, C, H, W). Element-wise
-                weights. Default: None.
-        """
         L1_recon = F.l1_loss(pred, target, reduction='none')
         loss = (L1_recon * mask).sum()/(mask.sum()+1e-5) / self.in_chans
         return self.loss_weight * loss

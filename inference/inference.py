@@ -6,31 +6,28 @@ import numpy as np
 import os
 import torch
 from torchvision.transforms.functional import normalize
-from ram.archs.promptir_arch import PromptIR
-from ram.archs.swinir_arch import SwinIR
+from ram.archs.restormerRFR_arch import RestormerRFR
+from ram.utils.dino_feature_extractor import DinoFeatureModule
 import os.path as osp
 def define_model(args):
-    if args.model =="ram_promptir":
-        model = PromptIR(decoder=True)
-    elif args.model == 'ram_swinir':
-        model = SwinIR(
-            patch_size = 1,
-            in_chans = 3,
-            embed_dim = 180,
-            depths = [ 6, 6, 6, 6, 6, 6],
-            num_heads = [ 6, 6, 6, 6, 6, 6 ],
-            mlp_ratio = 2,
-            window_size = 8,
+    if args.model =="RestormerRFR":
+        model = RestormerRFR(
+            inp_channels=3, 
+            out_channels=3, 
+            dim = 48,
+            num_blocks = [4,6,6,8], 
+            num_refinement_blocks = 4,
+            heads = [1,2,4,8],
+            ffn_expansion_factor = 2.66,
+            bias = False,
+            LayerNorm_type = 'WithBias',   ## Other option 'BiasFree'
             finetune_type = None,
-            upscale = 1
+            img_size = 128
         )
     else:
         raise NotImplementedError
     loadnet = torch.load(args.model_path)
-    if 'params_ema' in loadnet:
-        keyname = 'params_ema'
-    else:
-        keyname = 'params'
+    keyname = 'params'
     model.load_state_dict(loadnet[keyname], strict=False)
     return model
 
@@ -45,7 +42,8 @@ def process_image(img_path, model, device, args):
 
     normalize(img, mean, std, inplace=True)
     with torch.no_grad():
-        output = model(img)
+        dino_features = DinoFeatureModule(img)
+        output = model(img,None,None,dino_features)
     output = normalize(output, -1 * mean / std, 1 / std)
     output = output.data.squeeze().float().cpu().clamp_(0, 1).numpy()
     if output.ndim == 3:
@@ -57,9 +55,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', type=str, required=True,help='input test image folder')
     parser.add_argument('--output', type=str, default='outputs/', help='output folder')
-    parser.add_argument('--model',type=str,default='ram_promptir', help='model type')
+    parser.add_argument('--model',type=str,default='RestormerRFR', help='model type')
     # TODO: it now only supports sr, need to adapt to dn and jpeg_car
-    parser.add_argument('--model_path',type=str,default='pretrained_model/ram_promptir_finetune.pth')
+    parser.add_argument('--model_path',type=str,default='pretrained_model/7task/RestormerRFR.pth')
     args = parser.parse_args()
 
     os.makedirs(args.output, exist_ok=True)

@@ -285,8 +285,7 @@ class RestormerRFR(nn.Module):
         bias = False,
         LayerNorm_type = 'WithBias',   ## Other option 'BiasFree'
         finetune_type = None,
-        img_size = 128,
-        adaptive_mask =True
+        img_size = 128
     ):
 
         super(RestormerRFR, self).__init__()
@@ -295,7 +294,6 @@ class RestormerRFR(nn.Module):
         self.patch_embed = OverlapPatchEmbed(inp_channels, dim)
         
         self.mask_token = torch.zeros(1, 3, img_size, img_size)
-        self.adaptive_mask = adaptive_mask
         
         self.dr_adaptation1 = DRAdaptation(dino_dim=1536, restore_dim=48, scale_factor=14, size=128)
         self.dr_adaptation2 = DRAdaptation(dino_dim=1536, restore_dim=48, scale_factor=14, size=128)

@@ -40,9 +40,16 @@ class GoProDataset(BaseDataset):
         if self.augmentator:
             img_lq = self.augmentator(img_lq)
 
-        img_gt, img_lq = self._process_images(img_gt, img_lq)
+        processed = self._process_images(img_gt, img_lq)
+        
+        return_dict = {
+            'lq': processed['lq'],
+            'gt': processed['gt'],
+            'lq_path': lq_path,
+            'gt_path': gt_path
+        }
 
-        return {'lq': img_lq, 'gt': img_gt, 'lq_path': lq_path, 'gt_path': gt_path}
-
+        return return_dict
+        
     def __len__(self):
         return len(self.paths)
