@@ -193,7 +193,6 @@ def get_env_info():
     import torch
     import torchvision
 
-    from ram.version import __version__
     msg = r"""
                 ____                _       _____  ____
                / __ ) ____ _ _____ (_)_____/ ___/ / __ \
@@ -206,8 +205,4 @@ def get_env_info():
   / /_/ // /_/ // /_/ // /_/ /  / /___/ /_/ // /__ / /<    /_/
   \____/ \____/ \____/ \____/  /_____/\____/ \___//_/|_|  (_)
     """
-    msg += ('\nVersion Information: '
-            f'\n\tram: {__version__}'
-            f'\n\tPyTorch: {torch.__version__}'
-            f'\n\tTorchVision: {torchvision.__version__}')
     return msg

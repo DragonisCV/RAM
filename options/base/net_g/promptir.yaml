@@ -1,3 +1,0 @@
-network_g:
-  type: PromptIR
-  decoder: true

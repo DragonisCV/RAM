@@ -1,0 +1,375 @@
+datasets:
+  val_1.1:
+    name: SOTS-outdoor
+    type: DehazeDataset
+    is_train: false
+    dataroot_gt: datasets/SOTS/outdoor/clear/
+    dataroot_lq: datasets/SOTS/outdoor/hazy/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_1.2.1:
+    name: Deraining-rain100L
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/rain13k/test/Rain100L/target/
+    dataroot_lq: datasets/rain13k/test/Rain100L/input/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_1.2.2:
+    name: Deraining-rain100H
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/rain13k/test/Rain100H/target/
+    dataroot_lq: datasets/rain13k/test/Rain100H/input/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_1.2.3:
+    name: Deraining-Test100
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/rain13k/test/Test100/target/
+    dataroot_lq: datasets/rain13k/test/Test100/input/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_1.2.4:
+    name: Deraining-Test1200
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/rain13k/test/Test1200/target/
+    dataroot_lq: datasets/rain13k/test/Test1200/input/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_1.2.5:
+    name: Deraining-Test2800
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/rain13k/test/Test2800/target/
+    dataroot_lq: datasets/rain13k/test/Test2800/input/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_1.3.1:
+    name: BSD68-Gaussian15
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CBSD68/CBSD68/original_png/
+    dataroot_lq: datasets/CBSD68/CBSD68/noisy15/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_1.3.2:
+    name: BSD68-Gaussian25
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CBSD68/CBSD68/original_png/
+    dataroot_lq: datasets/CBSD68/CBSD68/noisy25/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_1.3.3:
+    name: BSD68-Gaussian50
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CBSD68/CBSD68/original_png/
+    dataroot_lq: datasets/CBSD68/CBSD68/noisy50/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_1.4:
+    name: LowLight-LOL
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/LOL/test/target/
+    dataroot_lq: datasets/LOL/test/input/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_1.5:
+    name: GoPro
+    type: GoProDataset
+    is_train: false
+    dataroot: datasets/gopro/test
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_1.6:  # Deblur2.0
+    name: LSDIR_blur
+    type: LowCostDataset
+    is_train: false
+    dataroot_gt: datasets/LSDIR-val1/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    augment:
+      origin: ~
+      noise: ~
+      blur: 
+        mode: fix
+        sigma: 2.0
+      jpeg: ~
+      sr: ~
+    io_backend:
+      type: disk
+    test_crop: true
+    twinsmask: false
+  val_1.7:  # Dejpeg50
+    name: LSDIR_jpeg
+    type: LowCostDataset
+    is_train: false
+    dataroot_gt: datasets/LSDIR-val1/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    augment:
+      origin: ~
+      noise: ~
+      blur: ~
+      jpeg: 
+        mode: fix
+        q: 50
+      sr: ~
+    io_backend:
+      type: disk
+    test_crop: true
+    twinsmask: false
+  val_2.1:
+    name: CDD_haze
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/haze
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_2.2:
+    name: CDD_low
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_2.3:
+    name: CDD_rain
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/rain
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_2.4:
+    name: CDD_snow
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/snow
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_2.5:
+    name: CDD_haze_rain
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/haze_rain
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_2.6:
+    name: CDD_low_haze
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_haze
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_2.7:
+    name: CDD_low_rain
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_rain
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_2.8:
+    name: CDD_haze_snow
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/haze_snow
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_2.9:
+    name: CDD_low_snow
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_snow
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_2.10:
+    name: CDD_low_haze_rain
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_haze_rain
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_2.11:
+    name: CDD_low_haze_snow
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CDD-11_test/clear
+    dataroot_lq: datasets/CDD-11_test/low_haze_snow
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_3.1:
+    name: urban100_poison
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/urban100/urban100
+    dataroot_lq: datasets/urban100/urban100_poison
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_3.2:
+    name: urban100_pepper
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/urban100/urban100
+    dataroot_lq: datasets/urban100/urban100_pepper
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_3.3:
+    name: urban100_speckle
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/urban100/urban100
+    dataroot_lq: datasets/urban100/urban100_speckle
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_3.4:
+    name: urban_noisy15
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/urban100/urban100
+    dataroot_lq: datasets/urban100/urban_noisy15
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_3.5:
+    name: urban_noisy25
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/urban100/urban100
+    dataroot_lq: datasets/urban100/urban_noisy25
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_3.6:
+    name: urban_noisy50
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/urban100/urban100
+    dataroot_lq: datasets/urban100/urban_noisy50
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  

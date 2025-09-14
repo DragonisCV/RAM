@@ -1,0 +1,9 @@
+network_mask:
+  # type: AdaSAM
+  type: AdaptiveMaskPixGenerator
+  img_size: 128
+  patch_size: 8
+  in_chans: 3
+  embed_dim: 768
+  mask_ratio: 0.5
+  use_learnable_pos_emb: true

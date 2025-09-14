@@ -1,0 +1,62 @@
+datasets:
+  val_1:
+    name: SOTS-outdoor
+    type: DehazeDataset
+    is_train: false
+    dataroot_gt: datasets/SOTS/outdoor/clear/
+    dataroot_lq: datasets/SOTS/outdoor/hazy/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_2:
+    name: Deraining-rain100L
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/rain13k/test/Rain100L/target/
+    dataroot_lq: datasets/rain13k/test/Rain100L/input/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_3.1:
+    name: BSD68-Gaussian15
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CBSD68/CBSD68/original_png/
+    dataroot_lq: datasets/CBSD68/CBSD68/noisy15/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_3.2:
+    name: BSD68-Gaussian25
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CBSD68/CBSD68/original_png/
+    dataroot_lq: datasets/CBSD68/CBSD68/noisy25/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  val_3.3:
+    name: BSD68-Gaussian50
+    type: PairedImageDataset
+    is_train: false
+    dataroot_gt: datasets/CBSD68/CBSD68/original_png/
+    dataroot_lq: datasets/CBSD68/CBSD68/noisy50/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    crop_test: false
+    twinsmask: false
+  

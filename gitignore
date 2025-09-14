@@ -1,0 +1,5 @@
+# data / weights / experiment outputs
+datasets/
+pretrained_model/
+experiments/
+

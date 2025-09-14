@@ -15,7 +15,6 @@ from ram.utils.options import copy_opt_file, dict2str, parse_options
 
 
 def init_tb_loggers(opt):
-    # initialize wandb logger before tensorboard logger to allow proper sync
     if (opt['logger'].get('wandb') is not None) and (opt['logger']['wandb'].get('project')
                                                      is not None) and ('debug' not in opt['name']):
         assert opt['logger'].get('use_tb_logger') is True, ('should turn on tensorboard when using wandb')
@@ -27,7 +26,6 @@ def init_tb_loggers(opt):
 
 
 def create_train_val_dataloader(opt, logger):
-    # create train and val dataloaders
     train_loader, val_loaders = None, []
     for phase, dataset_opt in opt['datasets'].items():
         dataset_opt['gt_size'] = opt['gt_size']
@@ -91,34 +89,25 @@ def load_resume_state(opt):
 
 
 def train_pipeline(root_path):
-    # parse options, set distributed setting, set random seed
     opt, args = parse_options(root_path, is_train=True)
     opt['root_path'] = root_path
 
     torch.backends.cudnn.benchmark = True
-    # torch.backends.cudnn.deterministic = True
-
-    # load resume states if necessary
     resume_state = load_resume_state(opt)
-    # mkdir for experiments and logger
     if resume_state is None:
         make_exp_dirs(opt)
         if opt['logger'].get('use_tb_logger') and 'debug' not in opt['name'] and opt['rank'] == 0:
             mkdir_and_rename(osp.join(opt['root_path'], 'tb_logger', opt['name']))
 
-    # copy the yml file to the experiment root
+  
     copy_opt_file(args.opt, opt['path']['experiments_root'])
 
-    # WARNING: should not use get_root_logger in the above codes, including the called functions
-    # Otherwise the logger will not be properly initialized
     log_file = osp.join(opt['path']['log'], f"train_{opt['name']}_{get_time_str()}.log")
     logger = get_root_logger(logger_name='ram', log_level=logging.INFO, log_file=log_file)
     logger.info(get_env_info())
     logger.info(dict2str(opt))
-    # initialize wandb and tb loggers
     tb_logger = init_tb_loggers(opt)
 
-    # create train and validation dataloaders
     result = create_train_val_dataloader(opt, logger)
     train_loader, train_sampler, val_loaders, total_epochs, total_iters = result
 

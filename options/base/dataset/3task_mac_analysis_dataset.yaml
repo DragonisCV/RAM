@@ -1,0 +1,69 @@
+datasets:
+  val_1:
+    name: dehaze-ots
+    type: DehazeOTSBETADataset
+    is_train: false
+    dataroot_gt: ./datasets/OTS_BETA/clear/clear/
+    dataroot_lq: ./datasets/OTS_BETA/haze/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    test_crop: true
+    twinsmask: false
+  val_2:
+    name: deraining-100L
+    type: Rain100LTrainDataset
+    is_train: false
+    dataroot: ./datasets/RainTrainL
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    io_backend:
+      type: disk
+    test_crop: true
+    twinsmask: false
+  val_3.1:  
+    name: noise15
+    type: LowCostNoiseDataset
+    is_train: false
+    dataroot_gt: ./datasets/BSD400/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    augment:
+      noise:
+        mode: fix
+        var: 15
+    io_backend:
+      type: disk
+    test_crop: true
+    twinsmask: false
+  val_3.2:  
+    name: noise25
+    type: LowCostNoiseDataset
+    is_train: false
+    dataroot_gt: ./datasets/BSD400/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    augment:
+      noise:
+        mode: fix
+        var: 25
+    io_backend:
+      type: disk
+    test_crop: true
+    twinsmask: false
+  val_3.3:  
+    name: noise50
+    type: LowCostNoiseDataset
+    is_train: false
+    dataroot_gt: ./datasets/WaterlooED/WaterlooED/
+    mean: [0.485, 0.456, 0.406]
+    std: [0.229, 0.224, 0.225]
+    augment:
+      noise:
+        mode: fix
+        var: 50
+    io_backend:
+      type: disk
+    test_crop: true
+    twinsmask: false

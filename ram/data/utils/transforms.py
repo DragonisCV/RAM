@@ -22,7 +22,10 @@ def mod_crop(img, scale):
         raise ValueError(f'Wrong img ndim: {img.ndim}.')
     return img
 
-def center_crop(img_gt,crop_pad_size):
+def center_crop(img_gt, crop_pad_size):
+    # Add ensure_min_size check
+    img_gt = ensure_min_size(img_gt, crop_pad_size)
+    
     h, w = img_gt.shape[0:2]
     # pad
     if h < crop_pad_size or w < crop_pad_size:
@@ -36,20 +39,26 @@ def center_crop(img_gt,crop_pad_size):
         img_gt = img_gt[top:top + crop_pad_size, left:left + crop_pad_size, ...]
     return img_gt
 
-def random_crop(img_gt,crop_pad_size):
+def random_crop(img_gt, crop_pad_size_h, crop_pad_size_w=None):
+    if crop_pad_size_w is None:
+        crop_pad_size_w = crop_pad_size_h
+    
+    # Add ensure_min_size check
+    img_gt = ensure_min_size(img_gt, crop_pad_size_h)
+    
     h, w = img_gt.shape[0:2]
     # pad
-    if h < crop_pad_size or w < crop_pad_size:
-        pad_h = max(0, crop_pad_size - h)
-        pad_w = max(0, crop_pad_size - w)
+    if h < crop_pad_size_h or w < crop_pad_size_w:
+        pad_h = max(0, crop_pad_size_h - h)
+        pad_w = max(0, crop_pad_size_w - w)
         img_gt = cv2.copyMakeBorder(img_gt, 0, pad_h, 0, pad_w, cv2.BORDER_REFLECT_101)
     # crop
-    if img_gt.shape[0] > crop_pad_size or img_gt.shape[1] > crop_pad_size:
+    if img_gt.shape[0] > crop_pad_size_h or img_gt.shape[1] > crop_pad_size_w:
         h, w = img_gt.shape[0:2]
         # randomly choose top and left coordinates
-        top = random.randint(0, h - crop_pad_size)
-        left = random.randint(0, w - crop_pad_size)
-        img_gt = img_gt[top:top + crop_pad_size, left:left + crop_pad_size, ...]
+        top = random.randint(0, h - crop_pad_size_h)
+        left = random.randint(0, w - crop_pad_size_w)
+        img_gt = img_gt[top:top + crop_pad_size_h, left:left + crop_pad_size_w, ...]
     return img_gt
 
 def paired_random_crop(img_gts, img_lqs, gt_patch_size, scale, gt_path=None):
@@ -81,6 +90,19 @@ def paired_random_crop(img_gts, img_lqs, gt_patch_size, scale, gt_path=None):
     # determine input type: Numpy array or Tensor
     input_type = 'Tensor' if torch.is_tensor(img_gts[0]) else 'Numpy'
 
+    # Apply ensure_min_size based on input type
+    if input_type == 'Tensor':
+        img_gts = [paired_ensure_min_size_tensor(gt, lq, gt_patch_size)[0] 
+                  for gt, lq in zip(img_gts, img_lqs)]
+        img_lqs = [paired_ensure_min_size_tensor(gt, lq, gt_patch_size)[1] 
+                  for gt, lq in zip(img_gts, img_lqs)]
+    else:
+        img_gts = [paired_ensure_min_size(gt, lq, gt_patch_size)[0] 
+                  for gt, lq in zip(img_gts, img_lqs)]
+        img_lqs = [paired_ensure_min_size(gt, lq, gt_patch_size)[1] 
+                  for gt, lq in zip(img_gts, img_lqs)]
+
+    # Get updated dimensions
     if input_type == 'Tensor':
         h_lq, w_lq = img_lqs[0].size()[-2:]
         h_gt, w_gt = img_gts[0].size()[-2:]
@@ -212,3 +234,64 @@ def img_rotate(img, angle, center=None, scale=1.0):
     matrix = cv2.getRotationMatrix2D(center, angle, scale)
     rotated_img = cv2.warpAffine(img, matrix, (w, h))
     return rotated_img
+
+
+def paired_ensure_min_size(img_gt, img_lq, gt_size):
+    """Resize images if any dimension is smaller than gt_size while maintaining aspect ratio"""
+    h_gt, w_gt = img_gt.shape[0:2]
+    
+    # Check if resizing is needed
+    if h_gt < gt_size or w_gt < gt_size:
+        # Calculate scaling factor to make smallest side equal to gt_size
+        ratio = gt_size / min(h_gt, w_gt)
+        new_h, new_w = int(h_gt * ratio), int(w_gt * ratio)
+        
+        # Resize both images to the same size
+        img_gt = cv2.resize(img_gt, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+        img_lq = cv2.resize(img_lq, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+    
+    return img_gt, img_lq
+
+def ensure_min_size(img, min_size):
+    """Resize single image if any dimension is smaller than min_size while maintaining aspect ratio"""
+    h, w = img.shape[0:2]
+    
+    # Check if resizing is needed
+    if h < min_size or w < min_size:
+        # Calculate scaling factor to make smallest side equal to min_size
+        ratio = min_size / min(h, w)
+        new_h, new_w = int(h * ratio), int(w * ratio)
+        
+        # Resize image
+        img = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+    
+    return img
+
+def paired_ensure_min_size_tensor(img_gt, img_lq, gt_size):
+    """Resize tensor images if any dimension is smaller than gt_size while maintaining aspect ratio
+    
+    Args:
+        img_gt (Tensor): GT image tensor in [C, H, W] format
+        img_lq (Tensor): LQ image tensor in [C, H, W] format
+        gt_size (int): Target minimum size for GT image
+        
+    Returns:
+        tuple(Tensor, Tensor): Resized GT and LQ images
+    """
+    h_gt, w_gt = img_gt.size()[-2:]
+    
+    # Check if resizing is needed
+    if h_gt < gt_size or w_gt < gt_size:
+        # Calculate scaling factor to make smallest side equal to gt_size
+        ratio = gt_size / float(min(h_gt, w_gt))
+        new_h, new_w = int(h_gt * ratio), int(w_gt * ratio)
+        
+        # Resize both images using torch interpolate
+        img_gt = torch.nn.functional.interpolate(
+            img_gt.unsqueeze(0), size=(new_h, new_w), 
+            mode='bilinear', align_corners=False).squeeze(0)
+        img_lq = torch.nn.functional.interpolate(
+            img_lq.unsqueeze(0), size=(new_h, new_w), 
+            mode='bilinear', align_corners=False).squeeze(0)
+    
+    return img_gt, img_lq

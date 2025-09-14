@@ -114,6 +114,45 @@ class MSELoss(nn.Module):
         """
         return self.loss_weight * mse_loss(pred, target, weight, reduction=self.reduction)
 
+@LOSS_REGISTRY.register()
+class AdaptiveMaskL1Loss(nn.Module):
+    def __init__(self, loss_weight=1.0, reduction='mean'):
+        super(AdaptiveMaskL1Loss, self).__init__()
+        if reduction not in ['none', 'mean', 'sum']:
+            raise ValueError(f'Unsupported reduction mode: {reduction}. ' f'Supported ones are: {_reduction_modes}')
+
+        self.loss_weight = loss_weight
+        self.reduction = reduction
+        self.in_chans=3
+        
+    def forward(self, pred, target, mask, weight=None, **kwargs):
+        """
+        Args:
+            pred (Tensor): of shape (N, C, H, W). Predicted tensor.
+            target (Tensor): of shape (N, C, H, W). Ground truth tensor.
+            weight (Tensor, optional): of shape (N, C, H, W). Element-wise
+                weights. Default: None.
+        """
+        L1_recon = F.l1_loss(pred, target, reduction='none')
+        loss = (L1_recon * mask).sum()/(mask.sum()+1e-5) / self.in_chans
+        return self.loss_weight * loss
+
+@LOSS_REGISTRY.register()
+class AdaptiveMaskProbL1Loss(nn.Module):
+    def __init__(self, loss_weight=1.0, reduction='mean'):
+        super(AdaptiveMaskProbL1Loss, self).__init__()
+        if reduction not in ['none', 'mean', 'sum']:
+            raise ValueError(f'Unsupported reduction mode: {reduction}. ' f'Supported ones are: {_reduction_modes}')
+
+        self.loss_weight = loss_weight
+        self.reduction = reduction
+        self.in_chans=3
+        
+    def forward(self, pred, target, mask, p_x, weight=None, **kwargs):
+        L1_recon = F.l1_loss(pred, target, reduction='none')
+        log_p_x = torch.log(p_x + 1e-6)
+        loss = -(L1_recon * mask * log_p_x).sum()/(mask.sum()+1e-5) / self.in_chans
+        return self.loss_weight * loss
 
 @LOSS_REGISTRY.register()
 class CharbonnierLoss(nn.Module):
