@@ -1,0 +1,22 @@
+base:
+- options/base/dataset/3task_mac_analysis_dataset.yaml
+- options/base/net_g/AdaSAM_Restormer_woskip.yaml #net_g
+- options/base/net_mask/AdaSAM.yaml #net_mask
+
+name: 3task_mac
+scale: 1
+num_gpu: 1
+gt_size: 128
+pretrained_ratio: 0.5 
+num_samples: 10
+total_step: 200
+
+net_mask_path:
+  path: pretrained_model/setting1/AdaSAM_pretrained.pth
+  strict_load: false
+  param_key: params
+  
+path:
+  pretrain_network_g:  pretrained_model/setting1/RestormerWoSkip.pth
+  strict_load_g: false
+  param_key_g: params

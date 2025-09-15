@@ -1,0 +1,92 @@
+base:
+- options/base/dataset/3task_train_dataset.yaml #train dataset
+- options/base/net_g/AdaSAM_Restormer_woskip.yaml #net_g
+- options/base/net_mask/AdaSAM.yaml #net_mask
+
+# general settings
+name: 3task_pretrain
+model_type: adaSAMPretrainModel
+num_gpu: 8
+manual_seed: 0
+
+gt_size: 128
+# dataset and data loader settings
+datasets:
+  train: 
+    # data loader
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: 4
+
+# path
+path:
+  pretrain_network_g: ~
+  param_key_g: params_ema
+  strict_load_g: true
+  pretrain_network_mask: ~
+  param_key_mask: params_ema
+  strict_load_mask: true
+  resume_state: ~
+
+train:
+  optim_g:
+    type: Adam
+    lr: !!float 2e-4
+    weight_decay: 0
+    betas: [0.9, 0.99]
+
+  optim_mask:
+    type: Adam
+    lr: !!float 1e-6
+    weight_decay: 0
+    betas: [0.9, 0.99]
+
+  scheduler:
+    type: CosineAnnealingRestartLR
+    periods: [1080000]
+    restart_weights: [1]
+    eta_min: !!float 1e-6
+
+  total_iter: 1080000
+
+  warmup_iter: 40000  
+  ema_decay: 0.995  
+
+  pixel_opt:
+    type: AdaptiveMaskL1Loss
+    loss_weight: 1.0
+    reduction: mean
+
+  prob_pix_opt:
+    type: AdaptiveMaskProbL1Loss
+    loss_weight: 0.0001
+    reduction: mean
+
+  manual_seed: 0
+
+# validation settings
+val:
+  val_freq: !!float 5e10 # no validation
+  save_img: true
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: false
+
+# logging settings
+logger:
+  print_freq: 200
+  save_checkpoint_freq: !!float 1e4
+  train_image_visual: true
+  use_tb_logger: true
+  wandb:
+    project: ~
+    resume_id: ~
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29411
+
+find_unused_parameters: true

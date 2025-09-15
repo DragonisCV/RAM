@@ -5,11 +5,11 @@ from os import path as osp
 from ram.utils import get_root_logger, scandir
 from ram.utils.registry import LOSS_REGISTRY
 from .losses import (CharbonnierLoss, GANLoss, L1Loss, MaskL1Loss,MSELoss, PerceptualLoss, WeightedTVLoss, g_path_regularize,
-                     gradient_penalty_loss, r1_penalty,EdgeLoss)
+                     gradient_penalty_loss, r1_penalty,EdgeLoss,AdaptiveMaskL1Loss,AdaptiveMaskProbL1Loss)
 # __all__= ['build_loss'，gradient_penalty_loss', 'r1_penalty', 'g_path_regularize']
 __all__ = ['L1Loss', 'MaskL1Loss', 'MSELoss', 'CharbonnierLoss', 'EdgeLoss','WeightedTVLoss', 'PerceptualLoss', 'GANLoss', 'gradient_penalty_loss',
-    'r1_penalty', 'g_path_regularize']
-
+    'r1_penalty', 'g_path_regularize','AdaptiveMaskL1Loss','AdaptiveMaskProbL1Loss'
+]
 # automatically scan and import loss modules for registry
 # scan all the files under the 'losses' folder and collect files ending with '_loss.py'
 loss_folder = osp.dirname(osp.abspath(__file__))

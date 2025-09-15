@@ -42,7 +42,7 @@ class BaseDataset(data.Dataset):
         if self.mean is not None or self.std is not None:
             normalize(img_lq, self.mean, self.std, inplace=True)
             normalize(img_gt, self.mean, self.std, inplace=True)
-        return img_gt, img_lq
+        return {'gt': img_gt, 'lq': img_lq}
 
     def __getitem__(self, index):
         raise NotImplementedError("Subclass must implement abstract method")

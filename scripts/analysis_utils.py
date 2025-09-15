@@ -1,4 +1,3 @@
-
 import logging
 import math
 import os
@@ -87,11 +86,14 @@ class Hook_back_loop:
     def __init__(self, module, module_name):
         self.name = module_name
         self.hook = module.register_forward_hook(self.forward_hook)
+        self.grad = None
     
     def forward_hook(self, module, inp, out):    
         self.input = inp
         self.output = out
-        self.output.register_hook(self.backward_hook)
+        # 只在需要梯度的张量上注册钩子
+        if out.requires_grad:
+            out.register_hook(self.backward_hook)
 
     def backward_hook(self, grad):
         self.grad = grad
@@ -144,7 +146,7 @@ class BaseAnalysis(BaseModel):
 
         for name,param in self.model.named_parameters():
             module_name,name = get_module_from_name(name)
-
+            print(module_name,name)
             # print(module_name)
             if module_name != 'self.model':
                 if len(module_name_list)==0 or module_name_list[-1] != module_name:
@@ -152,7 +154,7 @@ class BaseAnalysis(BaseModel):
                     name_list.append(name)
                     module = eval(module_name)
                     hook_list.append(Hook_back_loop(module, name))
-
+        # print([hook.name for hook in hook_list])
         return hook_list
 
     def build_test_loaders(self):

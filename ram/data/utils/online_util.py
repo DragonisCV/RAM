@@ -125,19 +125,19 @@ class AugmentatorHub(Degrade):
 
 def parse_degradations(augment_opt):
     augmentators = []
-    if augment_opt['origin']:
+    if augment_opt.get('origin', False):
         augmentators.append(fwAdder())
-    if augment_opt['noise']:
+    if augment_opt.get('noise', False):
         setting = augment_opt['noise']
         mode = setting.get('mode','random')
         para = setting.get('var', 25)
         augmentators.append(NoiseAdder(mode,para))
-    if augment_opt['blur']:
+    if augment_opt.get('blur', False):
         setting = augment_opt['blur']
         mode = setting.get('mode','random')
         para = setting.get('sigma', 2.0)
         augmentators.append(BlurAdder(mode,para))
-    if augment_opt['jpeg']:
+    if augment_opt.get('jpeg', False):
         setting = augment_opt['jpeg']
         mode = setting.get('mode','random')
         para = setting.get('q', 50)
@@ -146,3 +146,4 @@ def parse_degradations(augment_opt):
         augmentators.append(fwAdder())
         
     return augmentators
+
