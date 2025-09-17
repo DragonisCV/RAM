@@ -6,7 +6,8 @@ tb_logger/*
 wandb/*
 tmp/*
 pretrained_models/*
-outputs/*
+pretrained_model/*
+iutputs/*
 
 docs/api
 scripts/__init__.py

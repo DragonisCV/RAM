@@ -12,11 +12,11 @@ num_samples: 10
 total_step: 200
 
 net_mask_path:
-  path: pretrained_model/setting2/AdaSAM_pretrained.pth
+  path: pretrained_model/7task/AdaSAM_pretrained.pth
   strict_load: false
   param_key: params
   
 path:
-  pretrain_network_g:  pretrained_model/setting2/RestormerWoSkip.pth
+  pretrain_network_g:  pretrained_model/7task/RestormerWoSkip.pth
   strict_load_g: false
   param_key_g: params

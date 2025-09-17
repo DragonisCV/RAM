@@ -14,7 +14,7 @@ datasets:
     ots_gt_path: ./datasets/OTS_BETA/clear/clear/
     ots_lq_path: ./datasets/OTS_BETA/haze/
     bsd_path: ./datasets/BSD400/
-    wed_path: ./datasets/WaterlooED/
+    wed_path: ./datasets/WaterlooED/WaterlooED
     # camera dataset setting
     augment1:
       noise:

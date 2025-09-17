@@ -5,42 +5,28 @@ from scripts.analysis_utils import BaseAnalysis,attr_grad
 import numpy as np
 from tqdm import tqdm
 from ram.archs import build_network
-from ram.archs.adaMask_tex_1pix_test_arch import AdaptiveMaskPixGeneratorTest
+from ram.archs.AdaSAM_arch import AdaptiveMaskPixGenerator
 
 class Ada_MACAnalysis(BaseAnalysis):
     def __init__(self, opt):
         super().__init__(opt)
         self.mask_generator = self._load_mask_generator(opt)
         self.mask_generator.eval()
-
         
-
     def _load_mask_generator(self, opt):
-        """加载预训练的掩码生成器模型"""
-        # 从 network_mask 读取模型配置
         mask_opt = opt.get('network_mask', {})
         mask_generator = build_network(mask_opt).to(self.device)
-        
-        # 从 net_mask_path 读取预训练权重路径配置
         mask_path_opt = opt.get('net_mask_path', {})
-        if mask_path_opt:
-            # 加载预训练权重
-            mask_path = mask_path_opt.get('path', None)
-            if mask_path:
-                self.load_network(
-                    mask_generator, 
-                    mask_path, 
-                    strict=mask_path_opt.get('strict_load', True),
-                    param_key=mask_path_opt.get('param_key', 'params')
-                )
-                print(f"成功加载掩码生成器权重: {mask_path}")
-            else:
-                print("警告: 未找到掩码生成器预训练权重路径")
-        else:
-            print("警告: 未找到net_mask_path配置")
-            
+        mask_path = mask_path_opt.get('path', None)
+        self.load_network(
+            mask_generator, 
+            mask_path, 
+            strict=mask_path_opt.get('strict_load', True),
+            param_key=mask_path_opt.get('param_key', 'params')
+        )
         mask_generator.eval()
         return mask_generator
+        
     def analyze(self):
         total_filter_mac = [0.0] * len(self.hook_list)
         for test_loader in self.test_loaders:
@@ -64,14 +50,7 @@ class Ada_MACAnalysis(BaseAnalysis):
         total_step = self.opt['total_step']
 
         with torch.no_grad():
-            # The mask generator handles padding and unpadding internally,
-            # and returns results in original image size.
             _, _, p_x_full = self.mask_generator(final_img)
-        
-        # p_x_full has shape [B, 1, H, W]. B=1 for single image analysis.
-        # Higher probability means more likely to be masked -> less important.
-        # We want to reveal pixels from most important to least important.
-        # Sorting probabilities in ascending order gives us the indices of pixels from most to least important.
         p_x_flat = p_x_full.flatten()
         order_array = torch.argsort(p_x_flat).cpu().numpy()
 
@@ -113,8 +92,6 @@ class Ada_MACAnalysis(BaseAnalysis):
                         all_hook_layer_conductance[i] += df * dy
 
             last_hook_layer_output = now_hook_layer_output
-
-        # 确保返回的结果始终是Tensor类型，而不是float
         return [torch.mean(torch.abs(cond) if isinstance(cond, torch.Tensor) else torch.tensor(0.0)).detach().cpu().numpy() for cond in all_hook_layer_conductance]
 
 def main():

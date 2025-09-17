@@ -82,7 +82,6 @@ def save(tensor, step):
     imwrite(output, f"result/cond/test/{step}.png")        
 
 class Hook_back_loop:
-    """钩子类,用于捕获前向和后向信息"""
     def __init__(self, module, module_name):
         self.name = module_name
         self.hook = module.register_forward_hook(self.forward_hook)
@@ -91,7 +90,6 @@ class Hook_back_loop:
     def forward_hook(self, module, inp, out):    
         self.input = inp
         self.output = out
-        # 只在需要梯度的张量上注册钩子
         if out.requires_grad:
             out.register_hook(self.backward_hook)
 
@@ -147,14 +145,12 @@ class BaseAnalysis(BaseModel):
         for name,param in self.model.named_parameters():
             module_name,name = get_module_from_name(name)
             print(module_name,name)
-            # print(module_name)
             if module_name != 'self.model':
                 if len(module_name_list)==0 or module_name_list[-1] != module_name:
                     module_name_list.append(module_name)
                     name_list.append(name)
                     module = eval(module_name)
                     hook_list.append(Hook_back_loop(module, name))
-        # print([hook.name for hook in hook_list])
         return hook_list
 
     def build_test_loaders(self):
@@ -195,5 +191,45 @@ class BaseAnalysis(BaseModel):
         np.savetxt(f"{save_folder}/filter_{folder_name}.txt", sorted_data, delimiter=',', fmt='%f')
         np.savetxt(f"{save_folder}/filter_index.txt", sorted_location, delimiter=',', fmt='%d')
         np.savetxt(f"{save_folder}/filter_name.txt", sorted_name, delimiter=',', fmt='%s')
+
+        # Robust Feature Regularization (RFR)
+        rfr_names = np.array([
+        "dr_fusion1.reduce_chan",
+        "dr_fusion2.reduce_chan",
+        "dr_fusion3.reduce_chan",
+        "dr_adaptation3.adaptation.0",
+        "dr_adaptation3.adaptation.2",
+        "dr_adaptation3.adaptation.1",
+        "dr_adaptation2.adaptation.0",
+        "dr_adaptation2.adaptation.2",
+        "dr_adaptation2.adaptation.1",
+        "dr_adaptation1.adaptation.2",
+        "dr_adaptation1.adaptation.0",
+        "dr_adaptation1.adaptation.1",
+        "up_4_3_dino2.body.0",
+        "up_4_3_dino1.body.0",
+        "up_3_2_dino.body.0",
+        "dino_fusion_deep.gate_network.4",
+        "dino_fusion_shallow.gate_network.2",
+        "dino_fusion_shallow.gate_network.3",
+        "dino_fusion_shallow.gate_network.0",
+        "dino_fusion_shallow.gate_network.1",
+        "dino_fusion_mid.gate_network.2",
+        "dino_fusion_mid.gate_network.3",
+        "dino_fusion_mid.gate_network.0",
+        "dino_fusion_mid.gate_network.1",
+        "dino_fusion_deep",
+        "dino_fusion_mid",
+        "dino_fusion_deep.gate_network.2",
+        "dino_fusion_deep.gate_network.3",
+        "dino_fusion_deep.gate_network.1",
+        "dino_fusion_deep.gate_network.0",
+        "dino_fusion_shallow",
+        "dino_fusion_shallow.gate_network.4",
+        "dino_fusion_mid.gate_network.4",
+        ], dtype=str)
+        combined_names = np.concatenate([rfr_names, sorted_name.astype(str)], axis=0)
+        
+        np.savetxt(f"{save_folder}/filter_name_RFR.txt", combined_names, delimiter=',', fmt='%s')
 
 

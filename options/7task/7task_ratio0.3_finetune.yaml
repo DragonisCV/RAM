@@ -4,7 +4,7 @@ base:
 
 # general settings
 name: 7task_ratio0.3_finetune
-model_type: adaMaskPixDinoFinetuneModel
+model_type: adaSAMFinetuneModel
 manual_seed: 0
 
 gt_size: 128
@@ -18,7 +18,7 @@ network_g:
 
 finetune_block:  
   filter_txt_path: mac_analysis_result/7task_mac/filter_name_RFR.txt
-  filter_ratio: 0.358 
+  filter_ratio: 0.358  # Note: not exactly 30% since newly introduced RFR params are also fine-tuned.
 
 # dataset and data loader settings
 datasets:
@@ -33,7 +33,7 @@ datasets:
 
 # path
 path:
-  pretrain_network_g: pretrained_model/setting2/RestormerWoSkip_pretrained.pth
+  pretrain_network_g: pretrained_model/7task/RestormerWoSkip.pth
   param_key_g: params
   strict_load_g: false
   resume_state: ~

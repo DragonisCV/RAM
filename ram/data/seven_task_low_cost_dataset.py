@@ -39,8 +39,7 @@ class LowCostDataset(BaseDataset):
         else:
             img_gt = self._test_preprocessing(img_gt)
         
-        if self.augmentator:
-            img_lq = self.augmentator(img_lq)
+        img_lq = self.augmentator(img_gt)
 
         processed = self._process_images(img_gt, img_lq)
         

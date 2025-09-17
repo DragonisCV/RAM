@@ -1,3 +1,7 @@
+# RAM++: Robust Representation Learning via Adaptive Mask for All-in-One Image Restoration
+# Zilong Zhang, Chujie Qin, Chunle Guo, Yong Zhang, Chao Xue, Ming-Ming Cheng and Chongyi Li
+# https://arxiv.org/abs/2509.12039
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -269,7 +273,7 @@ class DinoRestoreFeatureFusion(nn.Module):
         return res
         
     
-##---------- restormer -----------------------
+##---------- restormerRFR -----------------------
 
 
 @ARCH_REGISTRY.register()
@@ -283,7 +287,7 @@ class RestormerRFR(nn.Module):
         heads = [1,2,4,8],
         ffn_expansion_factor = 2.66,
         bias = False,
-        LayerNorm_type = 'WithBias',   ## Other option 'BiasFree'
+        LayerNorm_type = 'WithBias',   
         finetune_type = None,
         img_size = 128
     ):
@@ -311,23 +315,23 @@ class RestormerRFR(nn.Module):
 
 
         self.encoder_level1 = nn.Sequential(*[TransformerBlock(dim=dim, num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type,finetune_type=finetune_type if i==num_blocks[0]-1 else None) for i in range(num_blocks[0])])
-        self.down1_2 = Downsample(dim) ## From Level 1 to Level 2
+        self.down1_2 = Downsample(dim) 
         self.encoder_level2 = nn.Sequential(*[TransformerBlock(dim=int(dim*2**1), num_heads=heads[1], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type,finetune_type=finetune_type if i==num_blocks[1]-1 else None) for i in range(num_blocks[1])])       
-        self.down2_3 = Downsample(int(dim*2**1)) ## From Level 2 to Level 3
+        self.down2_3 = Downsample(int(dim*2**1)) 
         self.encoder_level3 = nn.Sequential(*[TransformerBlock(dim=int(dim*2**2), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type,finetune_type=finetune_type if i==num_blocks[2]-1 else None) for i in range(num_blocks[2])])
-        self.down3_4 = Downsample(int(dim*2**2)) ## From Level 3 to Level 4
+        self.down3_4 = Downsample(int(dim*2**2)) 
         self.latent = nn.Sequential(*[TransformerBlock(dim=int(dim*2**3), num_heads=heads[3], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type,finetune_type=finetune_type if i==num_blocks[3]-1 else None) for i in range(num_blocks[3])])
         
-        self.up4_3 = Upsample(int(dim*2**3)) ## From Level 4 to Level 3
+        self.up4_3 = Upsample(int(dim*2**3)) 
         self.reduce_chan_level3 = nn.Conv2d(int(dim*2**3), int(dim*2**2), kernel_size=1, bias=bias)
         self.decoder_level3 = nn.Sequential(*[TransformerBlock(dim=int(dim*2**2), num_heads=heads[2], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type,finetune_type=finetune_type if i==num_blocks[2]-1 else None) for i in range(num_blocks[2])])
 
 
-        self.up3_2 = Upsample(int(dim*2**2)) ## From Level 3 to Level 2
+        self.up3_2 = Upsample(int(dim*2**2))
         self.reduce_chan_level2 = nn.Conv2d(int(dim*2**2), int(dim*2**1), kernel_size=1, bias=bias)
         self.decoder_level2 = nn.Sequential(*[TransformerBlock(dim=int(dim*2**1), num_heads=heads[1], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type,finetune_type=finetune_type if i==num_blocks[1]-1 else None) for i in range(num_blocks[1])])
         
-        self.up2_1 = Upsample(int(dim*2**1))  ## From Level 2 to Level 1  (NO 1x1 conv to reduce channels)
+        self.up2_1 = Upsample(int(dim*2**1)) 
         self.decoder_level1 = nn.Sequential(*[TransformerBlock(dim=int(dim*2**1), num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type,finetune_type=finetune_type if i==num_blocks[0]-1 else None) for i in range(num_blocks[0])])
         self.refinement = nn.Sequential(*[TransformerBlock(dim=int(dim*2**1), num_heads=heads[0], ffn_expansion_factor=ffn_expansion_factor, bias=bias, LayerNorm_type=LayerNorm_type,finetune_type=finetune_type if i==num_refinement_blocks-1 else None) for i in range(num_refinement_blocks)])
         self.output = nn.Conv2d(int(dim*2**1), out_channels, kernel_size=3, stride=1, padding=1, bias=bias)
@@ -340,7 +344,7 @@ class RestormerRFR(nn.Module):
         mod_pad_w = (pad_size - w % pad_size) % pad_size
         x = F.pad(x, (0, mod_pad_w, 0, mod_pad_h), 'reflect')
         return x
-    def forward(self, inp_img, mask=None, mask_tokens = None ,dino_features =None ):
+    def forward(self, inp_img, dino_features =None ):
         b,c,h,w = inp_img.shape
 
         shallow_feat1, mid_feat1, deep_feat1, shallow_feat2, mid_feat2, deep_feat2 = dino_features.values()
@@ -360,31 +364,31 @@ class RestormerRFR(nn.Module):
 
         inp_enc_level4 = self.down3_4(out_enc_level3)        
 
-        latent = self.latent(inp_enc_level4)   # [B, 384, 16, 16]
+        latent = self.latent(inp_enc_level4)  
         
 
-        # 获取特征
+       
         
         shallow_feat = self.dino_fusion_shallow(shallow_feat1, shallow_feat2)
         mid_feat = self.dino_fusion_mid(mid_feat1, mid_feat2)
         deep_feat = self.dino_fusion_deep(deep_feat1, deep_feat2)
 
-        shallow_feat = self.dr_adaptation1(shallow_feat, latent) #调整维度 保证能够进行交叉注意力机制
+        shallow_feat = self.dr_adaptation1(shallow_feat, latent) 
         mid_feat = self.dr_adaptation2(mid_feat, latent)
         deep_feat = self.dr_adaptation3(deep_feat, latent)
 
-        latent = self.dr_fusion1(dino_feat=deep_feat, restore_feat=latent) #融合 DINO特征
-        shallow_feat = self.up_4_3_dino1(shallow_feat)# 维持dino特征与restore特征的尺寸一致   [B, 192, 32, 32]
+        latent = self.dr_fusion1(dino_feat=deep_feat, restore_feat=latent) 
+        shallow_feat = self.up_4_3_dino1(shallow_feat)
         mid_feat = self.up_4_3_dino2(mid_feat)
 
-        inp_dec_level3 = self.up4_3(latent) # [B, 192, 32, 32]
+        inp_dec_level3 = self.up4_3(latent) 
         inp_dec_level3 = torch.cat([inp_dec_level3, out_enc_level3], 1)
-        inp_dec_level3 = self.reduce_chan_level3(inp_dec_level3) ## [B, 192, 32, 32]
+        inp_dec_level3 = self.reduce_chan_level3(inp_dec_level3)
 
         out_dec_level3 = self.decoder_level3(inp_dec_level3)
 
-        out_dec_level3 = self.dr_fusion2(dino_feat=mid_feat, restore_feat=out_dec_level3) #融合 DINO特征 
-        shallow_feat = self.up_3_2_dino(shallow_feat)# 维持dino特征与restore特征的尺寸一致  [B, 96, 64, 64]
+        out_dec_level3 = self.dr_fusion2(dino_feat=mid_feat, restore_feat=out_dec_level3) 
+        shallow_feat = self.up_3_2_dino(shallow_feat)
         inp_dec_level2 = self.up3_2(out_dec_level3)
         
         inp_dec_level2 = torch.cat([inp_dec_level2, out_enc_level2], 1)
@@ -392,7 +396,7 @@ class RestormerRFR(nn.Module):
 
         out_dec_level2 = self.decoder_level2(inp_dec_level2)  
 
-        out_dec_level2 = self.dr_fusion3(dino_feat=shallow_feat, restore_feat=out_dec_level2) #融合 DINO特征      
+        out_dec_level2 = self.dr_fusion3(dino_feat=shallow_feat, restore_feat=out_dec_level2) 
 
 
         inp_dec_level1 = self.up2_1(out_dec_level2)

@@ -12,6 +12,8 @@ class LOLv2Dataset(BaseDataset):
         self.augmentator = augmentator
         self.filename_tmpl = opt.get('filename_tmpl', '{}')
         self.paths = self._get_image_paths()
+        if self.opt.get('limit_ratio'):
+            self._limit_dataset()
 
     def __getitem__(self, index):
         self._init_file_client()
@@ -28,14 +30,16 @@ class LOLv2Dataset(BaseDataset):
         if self.augmentator is not None:
             img_lq = self.augmentator(img_lq)
 
-        img_gt, img_lq = self._process_images(img_gt, img_lq)
-
-        return {
-            'lq': img_lq, 
-            'gt': img_gt, 
+        processed = self._process_images(img_gt, img_lq)
+        
+        return_dict = {
+            'lq': processed['lq'], 
+            'gt': processed['gt'], 
             'lq_path': self.paths[index]['lq_path'], 
             'gt_path': self.paths[index]['gt_path']
         }
+            
+        return return_dict
 
     def __len__(self):
         return len(self.paths)

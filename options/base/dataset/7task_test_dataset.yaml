@@ -301,11 +301,11 @@ datasets:
     crop_test: false
     twinsmask: false
   val_3.1:
-    name: urban100_poison
+    name: urban100_poisson
     type: PairedImageDataset
     is_train: false
     dataroot_gt: datasets/urban100/urban100
-    dataroot_lq: datasets/urban100/urban100_poison
+    dataroot_lq: datasets/urban100/urban100_poisson
     mean: [0.485, 0.456, 0.406]
     std: [0.229, 0.224, 0.225]
     io_backend:

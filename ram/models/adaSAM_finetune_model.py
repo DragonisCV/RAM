@@ -8,20 +8,30 @@ from tqdm import tqdm
 import torch.distributed as dist
 
 from ram.archs import build_network
+from ram.losses import build_loss
 from ram.metrics import calculate_metric, calculate_psnr, calculate_ssim
 from ram.utils import get_root_logger, imwrite, tensor2img
 from ram.utils.registry import MODEL_REGISTRY
-
-from .ram_base_model import RAMBaseModel
+from ram.utils.dist_util import master_only
+from .base_model import BaseModel
 from ram.utils.dino_feature_extractor import DinoFeatureModule
 
 
 @MODEL_REGISTRY.register()
-class adaSAMFinetuneModel(RAMBaseModel):
+class adaSAMFinetuneModel(BaseModel):
     """MIM Stage 2 model for image restoration."""
 
     def __init__(self, opt):
         super(adaSAMFinetuneModel, self).__init__(opt)
+        
+        self.net_g = build_network(opt['network_g'])
+        self.net_g = self.model_to_device(self.net_g)
+        self.print_network(self.net_g)
+
+        if self.is_train:
+            self.init_training_settings()
+        else:
+            self.load_pretrained_models()
 
         self.metric_results = {}
         if 'val' in opt and 'metrics' in opt['val']:
@@ -38,6 +48,7 @@ class adaSAMFinetuneModel(RAMBaseModel):
                     self.best_metric_results[dataset_name][metric]['val'] = -float('inf')
                     self.best_metric_results[dataset_name][metric]['iter'] = -1
                     self.best_metric_results[dataset_name][metric]['better'] = 'higher'
+        
         self.dino_feature_extractor = DinoFeatureModule().to(self.device)
 
     def load_pretrained_models(self):
@@ -94,43 +105,36 @@ class adaSAMFinetuneModel(RAMBaseModel):
         optim_type = train_opt['optim_g'].pop('type')
         self.optimizer_g = self.get_optimizer(optim_type, optim_params, **train_opt['optim_g'])
         self.optimizers.append(self.optimizer_g)
+   
+    def setup_loss_functions(self):
+        train_opt = self.opt['train']
+        self.cri_pix = build_loss(train_opt['pixel_opt']).to(self.device) if train_opt.get('pixel_opt') else None
+        self.cri_perceptual = build_loss(train_opt['perceptual_opt']).to(self.device) if train_opt.get('perceptual_opt') else None
+
+        if self.cri_pix is None and self.cri_perceptual is None:
+            raise ValueError('Both pixel and perceptual losses are None.')
 
     def feed_data(self, data):
-        """Feed data to the model.
-        
-        Args:
-            data (dict): includes the data itself and its metadata information.
-        """
-        super(adaSAMFinetuneModel, self).feed_data(data)
-        self.mask = data['mask'].to(self.device) if 'mask' in data else None
-
+        self.gt = data['gt'].to(self.device)
+        self.gt_path = data['gt_path']
+        self.lq = data.get('lq', None)
+        if self.lq is not None:
+            self.lq = self.lq.to(self.device)
+        self.lq_path = data.get('lq_path', None)
 
     def optimize_parameters(self, current_iter):
         self.optimizer_g.zero_grad()
         self.dino_features = self.dino_feature_extractor(self.lq)
         deep_feat1 = self.dino_features['deep_feat1']
         self.dino_features = {key: deep_feat1 for key in self.dino_features}
-        self.output = self.net_g(self.lq, self.mask,None,self.dino_features)
+        self.output = self.net_g(self.lq, self.dino_features)
 
         l_total = 0
         loss_dict = OrderedDict()
         if self.cri_pix:
-            l_pix = self.cri_pix(self.output, self.gt, self.mask)
+            l_pix = self.cri_pix(self.output, self.gt)
             l_total += l_pix
             loss_dict['l_pix'] = l_pix
-
-        if self.cri_perceptual:
-            l_percep = self.cri_perceptual(self.output, self.gt)
-            if l_percep is not None:
-                l_total += l_percep
-                loss_dict['l_percep'] = l_percep
-        
-        if self.cri_high_freq:
-            l_high_freq = self.cri_high_freq(self.output, self.gt)
-            if l_high_freq is not None:
-                l_total += l_high_freq
-                loss_dict['l_high_freq'] = l_high_freq
-
 
 
         l_total.backward()
@@ -145,50 +149,11 @@ class adaSAMFinetuneModel(RAMBaseModel):
         self.net_g.eval()
         with torch.no_grad():
             self.dino_features = self.dino_feature_extractor(self.lq)
-            deep_feat1 = self.dino_features['deep_feat1']
-            self.dino_features = {key: deep_feat1 for key in self.dino_features}
-            self.output = self.net_g(self.lq, self.mask,None,self.dino_features)
+            self.output = self.net_g(self.lq, self.dino_features)
 
         self.net_g.train()
     
-    def split_test(self,size=128):
-        b, c, h, w = self.lq.shape
-        patches = []
-        
-        num_patches_h = (h + size - 1) // size
-        num_patches_w = (w + size - 1) // size
-        last_h = h - (num_patches_h - 1) * size
-        last_w = w - (num_patches_w - 1) * size
-        self.output = torch.zeros((b, c, h, w), device=self.lq.device)
-        
-        with torch.no_grad():
-            for i in range(num_patches_h):
-                for j in range(num_patches_w):
-                    y1 = min(i * size, h - size)
-                    y2 = y1 + size
-                    x1 = min(j * size, w - size)
-                    x2 = x1 + size
-                    
-                    patch = self.lq[:, :, y1:y2, x1:x2]
-            
-                    if hasattr(self, 'net_g_ema'):
-                        self.net_g_ema.eval()
-                    
-                        output_patch = self.net_g_ema(patch)
-                    else:
-                        self.net_g.eval()
-                        output_patch = self.net_g(patch)
-                        self.net_g.train()
-                    
-                    if i == num_patches_h - 1 and j == num_patches_w - 1:
-                        self.output[:, :, -last_h:, -last_w:] = output_patch[:, :, -last_h:, -last_w:]
-                    elif i == num_patches_h - 1:
-                        self.output[:, :, -last_h:, x1:x2] = output_patch[:, :, -last_h:, :]
-                    elif j == num_patches_w - 1:
-                        self.output[:, :, y1:y2, -last_w:] = output_patch[:, :, :, -last_w:]
-                    else:
-                        self.output[:, :, y1:y2, x1:x2] = output_patch
-
+   
     def dist_validation(self, dataloader, current_iter, tb_logger, save_img, test_num=-1, save_num=-1):
         dataset_name = dataloader.dataset.opt['name']
         with_metrics = self.opt['val'].get('metrics') is not None
@@ -482,10 +447,11 @@ class adaSAMFinetuneModel(RAMBaseModel):
                 tb_logger.add_scalar(f'metrics/{dataset_name}/{metric}', value, current_iter)
 
     def get_current_visuals(self):
-        out_dict = super(adaSAMFinetuneModel, self).get_current_visuals()
-        if self.mask is not None:
-            out_dict['mask'] = self.mask.detach().cpu()
-
+        out_dict = OrderedDict()
+        out_dict['lq'] = self.lq.detach().cpu()
+        out_dict['result'] = self.output.detach().cpu()
+        if hasattr(self, 'gt'):
+            out_dict['gt'] = self.gt.detach().cpu()
         return out_dict
 
     def _update_best_metric_results(self, dataset_name, current_iter):
@@ -496,3 +462,57 @@ class adaSAMFinetuneModel(RAMBaseModel):
                 if current_value > self.best_metric_results[dataset_name][metric]['val']:
                     self.best_metric_results[dataset_name][metric]['val'] = current_value
                     self.best_metric_results[dataset_name][metric]['iter'] = current_iter
+
+    @master_only
+    def save_image(self, current_iter, img_name):
+        visuals = self.get_current_visuals()
+        
+        train_dataset_opt = self.opt.get('datasets', {}).get('train', {})
+        if 'mean' in train_dataset_opt and 'std' in train_dataset_opt:
+            mean = torch.tensor(train_dataset_opt['mean'])
+            std = torch.tensor(train_dataset_opt['std'])
+            denorm_mean = -mean / std
+            denorm_std = 1.0 / std
+            for key in visuals.keys():
+                if isinstance(visuals[key], torch.Tensor) and key != 'mask_img' and key != 'p_x':  
+                    from torchvision.transforms.functional import normalize
+                    normalize(visuals[key], denorm_mean, denorm_std, inplace=True)
+        out_img = []
+        if 'lq' in visuals:
+            lq_img = tensor2img([visuals['lq']])
+            out_img.append(lq_img)
+
+        if 'result' in visuals:
+            result_img = tensor2img([visuals['result']])
+            out_img.append(result_img)
+        
+        if 'gt' in visuals:
+            gt_img = tensor2img([visuals['gt']])
+            out_img.append(gt_img)
+        
+        sr_img = np.hstack(out_img)
+
+        del self.lq
+        del self.output
+        torch.cuda.empty_cache()
+
+        if self.opt['is_train']:
+            save_img_path = osp.join(self.opt['path']['visualization'],
+                                     f'{current_iter}_{img_name}.png')
+        else:
+            dataset_name = self.opt['datasets']['test']['name']
+            if self.opt['val']['suffix']:
+                save_img_path = osp.join(self.opt['path']['visualization'], dataset_name,
+                                         f'{img_name}_{self.opt["val"]["suffix"]}.png')
+            else:
+                save_img_path = osp.join(self.opt['path']['visualization'], dataset_name,
+                                         f'{img_name}_{self.opt["name"]}.png')
+        
+        imwrite(sr_img, save_img_path)
+        
+    def save(self, epoch, current_iter):
+        if hasattr(self, 'net_g_ema'):
+            self.save_network([self.net_g, self.net_g_ema], 'net_g', current_iter, param_key=['params', 'params_ema'])
+        else:
+            self.save_network(self.net_g, 'net_g', current_iter)
+        self.save_training_state(epoch, current_iter)

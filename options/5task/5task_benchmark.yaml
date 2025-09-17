@@ -4,7 +4,7 @@ base:
 
 
 name: 5task_benchmark
-model_type: adaMaskPixDinoFinetuneModel
+model_type: adaSAMFinetuneModel
 scale: 1
 num_gpu: 1  # set num_gpu: 0 for cpu mode
 gt_size: 512

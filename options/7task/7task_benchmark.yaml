@@ -4,14 +4,14 @@ base:
 
 
 name: 7task_benchmark
-model_type: adaMaskPixDinoFinetuneModel
+model_type: adaSAMFinetuneModel
 scale: 1
 num_gpu: 1  # set num_gpu: 0 for cpu mode
 gt_size: 512
 
 # path
 path:
-  pretrain_network_g: pretrained_model/setting2/RestormerRFR.pth
+  pretrain_network_g: pretrained_model/7task/RestormerRFR.pth
   strict_load_g: false
   param_key_g: params
 

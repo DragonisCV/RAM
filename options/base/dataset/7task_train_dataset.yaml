@@ -1,7 +1,7 @@
 datasets:
   train:
     name: RAM-Dataset-Setting
-    type: set2Dataset
+    type: sevenTaskDataset
     filename_tmpl: '{}'
     is_train: true
     io_backend:
@@ -28,7 +28,7 @@ datasets:
     rain_lq_path: ./datasets/rain13k/train/input/
     rain_gt_path: ./datasets/rain13k/train/target/
     gopro_path: ./datasets/gopro/train/
-    lol_v2_path: datasets/LOL-v2/
+    lol_v2_path: ./datasets/LOL-v2/
 
     # data loader
     num_worker_per_gpu: 4
