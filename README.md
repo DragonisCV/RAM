@@ -13,14 +13,14 @@ This is the official PyTorch codes for the extended paper. The base conference v
 - RAM++ is a Blind All-In-One Image Restoration framework that achieves  <b style='font-size: large'>Robust, Well-balanced, SOTA </b> performance across seen, unseen, extreme, and mixed degradations.
 - RAM++ focus on tackling how to extract <b style='font-size: large'>Image Prior</b> instead of degradation prior from diverse corrupted images by Leveraging <b style='font-size: large'>Adaptive Mask Image Modeling</b>.
 
-## :newspaper: News
+## :tada: News
 <ul>
   <!-- <li><b>Feb 24, 2025</b>: A Jittor Version is available at <a href="https://github.com/Dragonisss/RAM-Jittor">RAM-Jittor</a>.</li>
    <li><b>Oct 20, 2024</b>: Release  on <a href="https://drive.google.com/drive/folders/1CDX02vmpPoeWBahvvg2OAH8jwhtBwwmB?usp=drive_link">Google Drive</a>.</li> -->
   <li><b>Sep 17, 2025</b>: Release related code of our paper.</li>
 </ul>
 
-## :tada: TBD
+## :newspaper: TBD
 <li>Release related checkpoints of our paper.</li>
 <li>Release 3-task datasets of our paper.</li>
 
