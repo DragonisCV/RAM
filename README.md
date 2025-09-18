@@ -21,9 +21,9 @@ This is the official PyTorch codes for the extended paper. The base conference v
   <li><b>Sep 17, 2025</b>: Release related code of our paper.</li>
 </ul>
 
-## :newspaper: TBD
+<!-- ## :newspaper: TBD
 <li>Release related checkpoints of our paper.</li>
-<li>Release 3-task datasets of our paper.</li>
+<li>Release 3-task datasets of our paper.</li> -->
 
 
 ## :wrench: Dependencies and Installation
