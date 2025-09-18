@@ -1,6 +1,6 @@
 # <p align="center"> :fire: <code>RAM++: <u>R</u>obust Representation Learning via <u>A</u>daptive <u>M</u>ask for All-in-One Image Restoration</code></p>
 
-## <div align="center"><a href="https://zilong-zhang003.github.io/RAM2.0/">Homepage</a> | <a href="https://arxiv.org/abs/2509.12039">Paper</a> | <a href="">Google Drive(TBD)</a> | <a href="">Baidu Cloud(TBD)</a>
+## <div align="center"><a href="https://zilong-zhang003.github.io/RAM2.0/">Homepage</a> | <a href="https://arxiv.org/abs/2509.12039">Paper</a> | <a href="https://drive.google.com/drive/folders/1P3eCe05HP0ET-_L2AXIastQ7tVrCb5E0?usp=sharing">Google Drive</a> | <a href="https://huggingface.co/233zzl/RAM2.0_pretrained_models">Hugging Face</a>
 
 This is the official PyTorch codes for the extended paper. The base conference version ([RAM](https://arxiv.org/pdf/2409.19403), ECCV 2024) is available [here](https://github.com/DragonisCV/RAM) 
 > **RAM++: <u>R</u>obust Representation Learning via <u>A</u>daptive <u>M</u>ask for All-in-One Image Restoration**<br>
@@ -17,6 +17,7 @@ This is the official PyTorch codes for the extended paper. The base conference v
 <ul>
   <!-- <li><b>Feb 24, 2025</b>: A Jittor Version is available at <a href="https://github.com/Dragonisss/RAM-Jittor">RAM-Jittor</a>.</li>
    <li><b>Oct 20, 2024</b>: Release  on <a href="https://drive.google.com/drive/folders/1CDX02vmpPoeWBahvvg2OAH8jwhtBwwmB?usp=drive_link">Google Drive</a>.</li> -->
+   <li><b>Sep 18, 2025</b>: Release pretraied models and datasets of our paper.</li>
   <li><b>Sep 17, 2025</b>: Release related code of our paper.</li>
 </ul>
 
@@ -56,31 +57,31 @@ We combine datasets from various restoration tasks to form the training set. Her
     <tr>
         <td>OTS_BETA </td>
     <th>Train </th>
-    <th> [<a href="">Coming Soon</a>]</th>
+    <th> [<a href="https://sites.google.com/view/reside-dehaze-datasets/reside-%CE%B2">HomePage</a>]</th>
     <th> 3-task Dehaze </th>
       </tr>
       <tr>
         <td>Rain-100L</td>
         <th>Train & Test</th>
-        <th>[<a href="">Coming Soon</a>]</th>
+        <th>[<a href="https://drive.google.com/drive/folders/1-_Tw-LHJF4vh8fpogKgZx1EQ9MhsJI_f">Download</a>]</th>
         <th>3/5-task Derain</th>
       </tr>
       <tr>
         <td>BSD400</td>
         <th>Train</th>
-        <th>[<a href="">Coming Soon</a>]</th>
+        <th>[<a href="https://drive.google.com/file/d/1idKFDkAHJGAFDn1OyXZxsTbOSBx9GS8N/view?usp=sharing">Download</a>]</th>
         <th>3/5-task Denoise</th>
       </tr>
       <tr>
         <td>WaterlooED</td>
         <th>Train</th>
-        <th>[<a href="">Coming Soon</a>]</th>
+        <th>[<a href="https://drive.google.com/file/d/19_mCE_GXfmE5yYsm-HEzuZQqmwMjPpJr/view?usp=sharing">Download</a>]</th>
         <th>3/5-task Denoise</th>
       </tr>
       <tr>
         <td>LOL-v1</td>
         <th>Train & Test</th>
-        <th>[<a href="">Coming Soon</a>]</th>
+        <th>[<a href="https://daooshee.github.io/BMVC2018website/">HomePage</a>]</th>
         <th>5-task Low Light Enhancement</th>
       </tr>
       <tr>
@@ -98,7 +99,7 @@ We combine datasets from various restoration tasks to form the training set. Her
       <tr>
         <td>Rain-13k</td>
         <th>Train & Test</th>
-        <th>[<a href="https://drive.google.com/drive/folders/1Hnnlc5kI0v9_BtfMytC2LR5VpLAFZtVe">Google Drive</a>]</th>
+        <th>[<a href="https://drive.google.com/drive/folders/1Hnnlc5kI0v9_BtfMytC2LR5VpLAFZtVe">Download</a>]</th>
         <th>7-task Derain</th>
       </tr>
       <tr>
@@ -134,7 +135,7 @@ We combine datasets from various restoration tasks to form the training set. Her
       <tr>
         <td>Urban100</td>
         <th>Test</th>
-        <th>[<a href="">Coming Soon</a>]</th>
+        <th>[<a href="https://drive.google.com/file/d/1687jSIjwMyF8MO9MYOZXT4OKJDS9HArD/view?usp=sharing">Download</a>]</th>
         <th>OOD 7-task Denoise</th>
       </tr>
       <tr>
@@ -187,11 +188,15 @@ datasets	              datasets
 ```
 
 We provide the pre-trained and fine-tuned model files in three different settings mentioned in the paper. Please download below weights and [DINOv2](https://huggingface.co/facebook/dinov2-giant), and place them under the `./pretrained_model` Directory.
+
+You can download all the mentioned model weights via <strong>[Hugging Face](https://huggingface.co/233zzl/RAM2.0_pretrained_models)</strong>.
+
+Or you can simply download only the models you are interested in:
 <table>
 <thead>
   <tr>
     <th> Method </th>
-    <th> Count </th>
+    <th> Task </th>
     <th> Phase </th>
     <th> Download Links </th>
     <th> Config File </th>
@@ -202,42 +207,42 @@ We provide the pre-trained and fine-tuned model files in three different setting
     <td>RAM++ </td>
      <th> 3-task </th>
     <th> Pretrain </th>
-    <th> [<a href="">Coming Soon</a>] </th>
+    <th> [<a href="https://drive.google.com/drive/folders/1laqeONsoArRC_BNH-2GYpl3pS0msg4Yv?usp=drive_link">Google Drive</a>] </th>
     <th> options/3task/3task_pretrain.yaml </th>
   </tr>
    <tr>
     <td>RAM++ </td>
      <th> 3-task  </th>
     <th> Finetune </th>
-    <th> [<a href="">Coming Soon</a>] </th>
+    <th> [<a href="https://drive.google.com/drive/folders/1laqeONsoArRC_BNH-2GYpl3pS0msg4Yv?usp=drive_link">Google Drive</a>] </th>
     <th> options/3task/3task_finetune.yaml </th>
   </tr>
     <tr>
     <td>RAM++ </td>
      <th> 5-task  </th>
     <th> Pretrain </th>
-    <th> [<a href="">Coming Soon</a>] </th>
+    <th> [<a href="https://drive.google.com/drive/folders/1NPUfW1Ma765WljbXOKTdrByNEca0sFC2?usp=drive_link">Google Drive</a>] </th>
     <th> options/5task/5task_pretrain.yaml </th>
   </tr>
     <tr>
     <td>RAM++ </td>
      <th> 5-task  </th>
     <th> Finetune </th>
-    <th> [<a href="">Coming Soon</a>] </th>
+    <th> [<a href="https://drive.google.com/drive/folders/1NPUfW1Ma765WljbXOKTdrByNEca0sFC2?usp=drive_link">Google Drive</a>] </th>
     <th> options/5task/5task_finetune.yaml </th>
   </tr>
   <tr>
     <td>RAM++ </td>
      <th> 7-task  </th>
     <th> Pretrain </th>
-    <th> [<a href="">Coming Soon</a>] </th>
+    <th> [<a href="https://drive.google.com/drive/folders/1RmmFoXAVagGrVc3fszbkCLKnj2rFTL5b?usp=drive_link">Google Drive</a>] </th>
     <th> options/7task/7task_pretrain.yaml </th>
   </tr>
     <tr>
     <td>RAM++ </td>
      <th> 7-task  </th>
     <th> Finetune </th>
-    <th> [<a href="">Coming Soon</a>] </th>
+    <th> [<a href="https://drive.google.com/drive/folders/1RmmFoXAVagGrVc3fszbkCLKnj2rFTL5b?usp=drive_link">Google Drive</a>] </th>
     <th>options/7task/7task_finetune.yaml </th>
   </tr>
 </tbody>
@@ -347,7 +352,7 @@ If you find our repo useful for your research, please consider citing our paper:
 
 ## :handshake: Acknowledgements
 
-This work builds upon the [BasicSR](https://github.com/XPixelGroup/BasicSR) toolbox. We are grateful to its authors and contributors for their outstanding open-source efforts and support.
+This work builds upon the [BasicSR](https://github.com/XPixelGroup/BasicSR) toolbox. Some code are brought from [Restormer](https://github.com/swz30/Restormer) and [AdaMAE](https://github.com/wgcban/adamae). We are grateful to its authors and contributors for their outstanding open-source efforts and support.
 
 
 ## :postbox: Contact
