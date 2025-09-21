@@ -6,8 +6,8 @@ import torch
 from os import path as osp
 
 from ram.data import build_dataloader, build_dataset
-from ram.data.data_sampler import EnlargedSampler
-from ram.data.prefetch_dataloader import CPUPrefetcher, CUDAPrefetcher
+from ram.data.utils.data_sampler import EnlargedSampler
+from ram.data.utils.prefetch_dataloader import CPUPrefetcher, CUDAPrefetcher
 from ram.models import build_model
 from ram.utils import (AvgTimer, MessageLogger, check_resume, get_env_info, get_root_logger, get_time_str,
                            init_tb_logger, init_wandb_logger, make_exp_dirs, mkdir_and_rename, scandir)

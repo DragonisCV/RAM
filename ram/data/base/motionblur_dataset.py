@@ -1,16 +1,16 @@
 import os
-from ram.data.base_dataset import BaseDataset
+from ram.data.base.base_dataset import BaseDataset
 from ram.utils.registry import DATASET_REGISTRY
 from ram.data.utils.data_util import paired_paths_from_folder
 
 @DATASET_REGISTRY.register()
 class GoProDataset(BaseDataset):
-    def __init__(self, opt, dataroot=None, augmentator=None):
+    def __init__(self, opt, dataroot=None, augmentator=None,enlarge_ratio=1):
         super(GoProDataset, self).__init__(opt)
         self.folder = dataroot or opt['dataroot']
         self.augmentator = augmentator
         self.paths = self._get_image_paths()
-
+        self.paths = self.paths * enlarge_ratio
     def _get_image_paths(self):
         paths = []
         for dataset in os.listdir(self.folder):

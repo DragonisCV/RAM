@@ -4,7 +4,7 @@ set -e
 eval "$(conda.shell.bash hook)"
 
 ### create enviroment
-conda create -n RAM -y python=3.7
+conda create -n RAM -y python=3.12
 conda activate RAM
 
 ### install package

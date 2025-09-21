@@ -1,5 +1,5 @@
 base:
-- options/base/dataset/ram_train_dataset.yaml #train dataset
+- options/base/dataset/7task/7task_train_dataset.yaml #train dataset
 - options/base/net_g/SwinIR_patch_1.yaml #net_g
 
 
@@ -32,7 +32,7 @@ datasets:
 
 # path
 path:
-  pretrain_network_g: pretrained_model/ram_swinir_pretrain.pth
+  pretrain_network_g: pretrained_model/ram/ram_swinir_pretrain.pth
   param_key_g: model
   strict_load_g: false
   # pretrain_network_d: ~

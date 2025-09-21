@@ -6,6 +6,7 @@ tb_logger/*
 wandb/*
 tmp/*
 pretrained_models/*
+pretrained_model/*
 outputs/*
 
 docs/api

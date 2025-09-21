@@ -139,6 +139,7 @@ def parse_options(root_path, is_train=True):
     opt = yaml_load(args.opt)
 
     # distributed settings
+
     if args.launcher == 'none':
         opt['dist'] = False
         print('Disable distributed.', flush=True)

@@ -1,17 +1,17 @@
 from torch.utils import data as data
-from ram.data.paired_image_dataset import PairedImageDataset
-from ram.data.dehaze_dataset import DehazeDataset
-from ram.data.gopro_dataset import GoProDataset
-from ram.data.low_cost_dataset import LowCostDataset
-from ram.data.lolv2_dataset import LOLv2Dataset
+from ram.data.base.derain_dataset import Rain13kDataset
+from ram.data.base.dehaze_dataset import DehazeOTSALPHADataset
+from ram.data.base.motionblur_dataset import GoProDataset
+from ram.data.base.low_cost_dataset import LowCostDataset
+from ram.data.base.lowlight_dataset import LOLv2Dataset
 from ram.utils.registry import DATASET_REGISTRY
 from ram.data.utils.online_util import parse_degradations
 import random
 
 @DATASET_REGISTRY.register()
-class RAMDataset(data.Dataset):
+class sevenTaskDataset(data.Dataset):
     def __init__(self, opt):
-        super(RAMDataset, self).__init__()
+        super(sevenTaskDataset, self).__init__()
         self.opt = opt
         self.file_client = None
         self.io_backend_opt = opt['io_backend']
@@ -19,8 +19,8 @@ class RAMDataset(data.Dataset):
         self.std = opt['std'] if 'std' in opt else None
 
         self.gt_folder, self.lq_folder = None,None #opt['dataroot_gt'], opt['dataroot_lq']
-        self.ots_dataset = DehazeDataset(opt,lq_path=opt['ots_lq_path'],gt_path=opt['ots_gt_path'])
-        self.rain13k_dataset = PairedImageDataset(opt,lq_path=opt['rain_lq_path'],gt_path=opt['rain_gt_path'])
+        self.ots_dataset = DehazeOTSALPHADataset(opt,lq_path=opt['ots_lq_path'],gt_path=opt['ots_gt_path'])
+        self.rain13k_dataset = Rain13kDataset(opt,lq_path=opt['rain_lq_path'],gt_path=opt['rain_gt_path'])
         self.deblur_dataset = GoProDataset(opt,dataroot=opt['gopro_path'])
         self.lol_dataset = LOLv2Dataset(opt,dataroot=opt['lol_v2_path'])
 

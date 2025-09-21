@@ -1,7 +1,7 @@
 datasets:
   train:
     name: RAM-Dataset-Setting
-    type: RAMDataset
+    type: sevenTaskDataset
     filename_tmpl: '{}'
     is_train: true
     io_backend:
@@ -11,9 +11,23 @@ datasets:
     scale : 1
     use_hflip: true
     use_rot: false
+
+    # dataset path
     ots_gt_path: ./datasets/OTS_ALPHA/clear/clear_images/
     ots_lq_path: ./datasets/OTS_ALPHA/haze/OTS/
     lsdir_path: ./datasets/LSDIR/
+    rain_lq_path: ./datasets/rain13k/train/input/
+    rain_gt_path: ./datasets/rain13k/train/target/
+    gopro_path: ./datasets/gopro/train/
+    lol_v2_path: ./datasets/LOL-v2/
+  
+    # enlarge ratio
+    noise_enlarge_ratio: 1
+    haze_enlarge_ratio: 1
+    rain_enlarge_ratio: 1
+    motionblur_enlarge_ratio: 1
+    lowlight_enlarge_ratio: 1
+
     # camera dataset setting
     augment:
       origin: 
@@ -25,10 +39,6 @@ datasets:
       jpeg: 
         mode: random
         
-    rain_lq_path: ./datasets/rain13k/train/input/
-    rain_gt_path: ./datasets/rain13k/train/target/
-    gopro_path: ./datasets/gopro/train/
-    lol_v2_path: datasets/LOL-v2/
 
     # data loader
     num_worker_per_gpu: 4

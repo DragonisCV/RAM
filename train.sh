@@ -1,5 +1,5 @@
-OPT=$1
-
-python -m torch.distributed.launch --nproc_per_node=1 --master_port=4321 ram/train.py \
---auto_resume \
--opt $OPT --launcher pytorch
+torchrun \
+--nproc_per_node=[num of gpus] \
+--master_port=[PORT] ram/train.py \
+-opt [OPT] \
+--launcher pytorch

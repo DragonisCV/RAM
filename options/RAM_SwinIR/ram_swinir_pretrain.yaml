@@ -1,5 +1,5 @@
 base:
-- options/base/dataset/ram_train_dataset.yaml #train dataset
+- options/base/dataset/7task/7task_train_dataset.yaml #train dataset
 - options/base/net_g/SwinIR_patch_1.yaml #net_g
 
 # general settings

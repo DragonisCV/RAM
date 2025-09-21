@@ -7,7 +7,7 @@ from copy import deepcopy
 from functools import partial
 from os import path as osp
 
-from ram.data.prefetch_dataloader import PrefetchDataLoader
+from ram.data.utils.prefetch_dataloader import PrefetchDataLoader
 from ram.utils import get_root_logger, scandir
 from ram.utils.dist_util import get_dist_info
 from ram.utils.registry import DATASET_REGISTRY
