@@ -51,7 +51,7 @@ This is the official PyTorch codes for the paper.
 
 ## :newspaper: News
 <ul>
-  <li><b>Sep 20, 2025</b>: Dec 27, 2023: Update an extension version of our ECCV 24 paper (Project Page/Paper).</li>
+  <li><b>Sep 20, 2025</b>: Update an extension version of our ECCV 24 paper (Project Page/Paper).</li>
   <li><b>Feb 24, 2025</b>: A Jittor Version is available at <a href="https://github.com/Dragonisss/RAM-Jittor">RAM-Jittor</a>.</li>
   <li><b>Oct 20, 2024</b>: Release pretrained weights on <a href="https://drive.google.com/drive/folders/1CDX02vmpPoeWBahvvg2OAH8jwhtBwwmB?usp=drive_link">Google Drive</a>.</li>
   <li><b>Oct 3, 2024</b>: Release related code of our paper.</li>
